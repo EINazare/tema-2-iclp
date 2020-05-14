@@ -48,17 +48,18 @@ end
 
 defmodule Server do
   def start_link do
-    {:ok, dragonPid} = Dragon.start_link(self())
-    {:ok, necromancerPid} = Necromancer.start_link(self())
-    Task.start_link(fn -> loop(dragonPid,necromancerPid) end)
+    pid = self()
+    {:ok, dragonPid} = Dragon.start_link(pid)
+    {:ok, necromancerPid} = Necromancer.start_link(pid)
+    loop(dragonPid,necromancerPid)
   end
   defp loop(dragonPid,necromancerPid) do
     receive do
       {:Whiptail, quantity} ->
-        send dragonPid, {:Whiptail, quantity}
+        send necromancerPid, {:Whiptail, quantity}
         loop(dragonPid,necromancerPid)
       {:Anti_zombie_bolt, quantity} ->
-        send necromancerPid, {:Anti_zombie_bolt, quantity}
+        send dragonPid, {:Anti_zombie_bolt, quantity}
         loop(dragonPid,necromancerPid)
     end
   end
