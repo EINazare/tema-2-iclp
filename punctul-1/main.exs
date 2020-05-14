@@ -1,18 +1,19 @@
 defmodule Necromancer do
   def start_link(pid) do
-    Task.start_link(fn -> recieve_attack(10000) end)
     Task.start_link(fn -> send_attack(pid) end)
+    Task.start_link(fn -> recieve_attack(10000,pid) end)
   end
-  defp recieve_attack(life) do
+  defp recieve_attack(life,pid) do
     cond do
       life > 0 ->
         receive do
-          {:Whiptail, quantity} -> recieve_attack(life - quantity)
+          {:Whiptail, quantity} -> recieve_attack(life - quantity,pid)
+          {:Dragon_has_died} -> IO.puts "A castigat necromancer-ul si a ramas cu " <> to_string(life) <> " cantitate de viata."
         end
       life < 0 ->
-        IO.puts "Necromancer has died"
+        send pid, {:Necromancer_has_died}
       life == 0 ->
-        IO.puts "Necromancer has died"
+        send pid, {:Necromancer_has_died}
     end
   end
   defp send_attack(pid) do
@@ -24,19 +25,20 @@ end
 
 defmodule Dragon do
   def start_link(pid) do
-    Task.start_link(fn -> recieve_attack(1000000) end)
     Task.start_link(fn -> send_attack(pid) end)
+    Task.start_link(fn -> recieve_attack(1000000,pid) end)
   end
-  defp recieve_attack(life) do
+  defp recieve_attack(life,pid) do
     cond do
       life > 0 ->
         receive do
-          {:Anti_zombie_bolt, quantity} -> recieve_attack(life - quantity)
+          {:Anti_zombie_bolt, quantity} -> recieve_attack(life - quantity,pid)
+          {:Necromancer_has_died} -> IO.puts "A castigat dragonul si a ramas cu " <> to_string(life) <> " cantitate de viata."
         end
       life < 0 ->
-        IO.puts "Dragon has died"
+        send pid, {:Dragon_has_died}
       life == 0 ->
-        IO.puts "Dragon has died"
+        send pid, {:Dragon_has_died}
     end
   end
   defp send_attack(pid) do
@@ -61,6 +63,10 @@ defmodule Server do
       {:Anti_zombie_bolt, quantity} ->
         send dragonPid, {:Anti_zombie_bolt, quantity}
         loop(dragonPid,necromancerPid)
+      {:Dragon_has_died} ->
+        send necromancerPid, {:Dragon_has_died}
+      {:Necromancer_has_died} ->
+        send dragonPid, {:Necromancer_has_died}
     end
   end
 end
