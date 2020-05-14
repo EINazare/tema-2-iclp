@@ -1,3 +1,5 @@
+processReciever = self()
+
 defmodule NecromancerStrategy do
   def run(processReciever) do
     random = Enum.random(0..1000)
@@ -5,9 +7,7 @@ defmodule NecromancerStrategy do
   end
 end
 
-processReciever = self()
-
-NecromancerStrategy.run(processReciever)
+spawn(NecromancerStrategy,:run,[processReciever])
 
 receive do
   {msg} -> IO.puts msg
