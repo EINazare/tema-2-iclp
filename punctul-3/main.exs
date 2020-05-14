@@ -8,7 +8,7 @@ defmodule ZombieKnight do
       life > 0 ->
         receive do
           {:Whiptail, quantity} ->
-            #IO.puts "ZombieKnight got hit for " <> to_string(quantity)
+            # IO.puts "ZombieKnight got hit for " <> to_string(quantity)
             recieve_attack(life - quantity,pid,selfPid)
         end
       life < 0 ->
@@ -36,7 +36,7 @@ defmodule Necromancer do
       life > 0 ->
         receive do
           {:Whiptail, quantity} ->
-            #IO.puts "Necromancer got hit for " <> to_string(quantity)
+            # IO.puts "Necromancer got hit for " <> to_string(quantity)
             recieve_attack(life - quantity,pid)
           {:Dragon_has_died} -> IO.puts "A castigat necromancer-ul si a ramas cu " <> to_string(life) <> " cantitate de viata."
         end
@@ -69,10 +69,10 @@ defmodule Dragon do
       life > 0 ->
         receive do
           {:Anti_zombie_bolt, quantity} ->
-            #IO.puts "Dragon got hit by Necromancer for " <> to_string(quantity)
+            # IO.puts "Dragon got hit by Necromancer for " <> to_string(quantity)
             recieve_attack(life - quantity,pid)
           {:Sword_slash, quantity} ->
-            #IO.puts "Dragon got hit by ZombieKnight for " <> to_string(quantity)
+            # IO.puts "Dragon got hit by ZombieKnight for " <> to_string(quantity)
             recieve_attack(life - quantity,pid)
           {:Necromancer_has_died} -> IO.puts "A castigat dragonul si a ramas cu " <> to_string(life) <> " cantitate de viata."
         end
