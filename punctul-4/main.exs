@@ -156,6 +156,7 @@ defmodule Server do
         send dragonPid, {:Shot, quantity}
         loop(dragonPid,necromancerAndArcherPids,pid,zombieKnightPids)
       {:Dragon_has_died} ->
+        [necromancerPid | _tail] = necromancerAndArcherPids
         send necromancerPid, {:Dragon_has_died}
       {:Necromancer_has_died} ->
         send dragonPid, {:Necromancer_has_died}
