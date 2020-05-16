@@ -4,27 +4,19 @@ defmodule Necromancer do
   end
   defp recieve_attack(life,pid,send_attack_pid) do
     cond do
-      life == 10000 && pid == nil ->
+      life > 0 ->
         receive do
           {:Dragon_pid, pid} ->
             {:ok, send_attack_pid} = Task.start_link(fn -> send_attack(pid) end)
             recieve_attack(life,pid,send_attack_pid)
-        end
-      life > 0 && pid != nil ->
-        receive do
           {:Whiptail, quantity} ->
             recieve_attack(life - quantity,pid,send_attack_pid)
           {:Dragon_has_died} ->
             IO.puts "A castigat necromancer-ul si a ramas cu " <> to_string(life) <> " cantitate de viata."
             Process.exit(send_attack_pid, :kill)
             Process.exit(self(), :normal)
-
         end
-      life < 0 && pid != nil ->
-        send pid, {:Necromancer_has_died}
-        Process.exit(send_attack_pid, :kill)
-        Process.exit(self(), :normal)
-      life == 0 && pid != nil ->
+      life < 0 || life == 0 ->
         send pid, {:Necromancer_has_died}
         Process.exit(send_attack_pid, :kill)
         Process.exit(self(), :normal)
@@ -43,29 +35,22 @@ defmodule Dragon do
   end
   defp recieve_attack(life,pid,send_attack_pid) do
     cond do
-      life == 1000000 && pid == nil ->
+      life > 0 ->
         receive do
           {:Necromancer_pid, pid} ->
             {:ok, send_attack_pid} = Task.start_link(fn -> send_attack(pid) end)
             recieve_attack(life,pid,send_attack_pid)
-        end
-      life > 0 && pid != nil ->
-        receive do
           {:Anti_zombie_bolt, quantity} ->
             recieve_attack(life - quantity,pid,send_attack_pid)
           {:Necromancer_has_died} ->
             IO.puts "A castigat dragonul si a ramas cu " <> to_string(life) <> " cantitate de viata."
-            Process.exit(self(), :normal)
             Process.exit(send_attack_pid, :kill)
-        end
-      life < 0 && pid != nil ->
+            Process.exit(self(), :normal)
+          end
+      life < 0 || life == 0 ->
         send pid, {:Dragon_has_died}
-        Process.exit(self(), :normal)
         Process.exit(send_attack_pid, :kill)
-      life == 0 && pid != nil ->
-        send pid, {:Dragon_has_died}
         Process.exit(self(), :normal)
-        Process.exit(send_attack_pid, :kill)
     end
   end
   defp send_attack(pid) do
