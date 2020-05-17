@@ -8,7 +8,7 @@ defmodule ZombieArcher do
       life > 0 ->
         receive do
           {:Whiptail, quantity} ->
-            # IO.puts "ZombieArcher got hit for " <> to_string(quantity)
+            # IO.puts "ZombieKnight got hit for " <> to_string(quantity)
             recieve_attack(life - quantity,pid,selfPid)
           {:Dragon_breath, quantity} ->
             # IO.puts "ZombieArcher got hit for " <> to_string(quantity)
@@ -60,8 +60,6 @@ end
 
 defmodule Necromancer do
   def start_link(pid) do
-    Task.start_link(fn -> summon_zombie_archer(pid) end)
-    Task.start_link(fn -> summon_zombie_knight(pid) end)
     Task.start_link(fn -> send_attack(pid) end)
     Task.start_link(fn -> recieve_attack(10000,pid) end)
   end
@@ -84,20 +82,22 @@ defmodule Necromancer do
     end
   end
   defp send_attack(pid) do
-    :timer.sleep(12)
-    random = Enum.random(0..1000)
-    send pid, {:Anti_zombie_bolt, random}
-    send_attack(pid)
-  end
-  defp summon_zombie_knight(pid) do
-    :timer.sleep(20)
-    send pid, {:Summon_zombie_knight}
-    summon_zombie_knight(pid)
-  end
-  defp summon_zombie_archer(pid) do
-    :timer.sleep(20)
-    send pid, {:Summon_zombie_archer}
-    summon_zombie_archer(pid)
+    atac_type = Enum.random(1..3)
+    cond do
+      atac_type == 1 ->
+        :timer.sleep(12)
+        random = Enum.random(0..1000)
+        send pid, {:Anti_zombie_bolt, random}
+        send_attack(pid)
+      atac_type == 2 ->
+        :timer.sleep(20)
+        send pid, {:Summon_zombie_knight}
+        send_attack(pid)
+      atac_type == 3 ->
+        :timer.sleep(20)
+        send pid, {:Summon_zombie_archer}
+        send_attack(pid)
+    end
   end
 end
 
@@ -115,6 +115,9 @@ defmodule Dragon do
             recieve_attack(life - quantity,pid)
           {:Sword_slash, quantity} ->
             # IO.puts "Dragon got hit by ZombieKnight for " <> to_string(quantity)
+            recieve_attack(life - quantity,pid)
+          {:Shot, quantity} ->
+            # IO.puts "Dragon got hit by ZombieArcher for " <> to_string(quantity)
             recieve_attack(life - quantity,pid)
           {:Necromancer_has_died} -> IO.puts "A castigat dragonul si a ramas cu " <> to_string(life) <> " cantitate de viata."
         end
