@@ -107,6 +107,9 @@ defmodule Dragon do
           {:Sword_slash, quantity} ->
             # IO.puts "Dragon got hit by ZombieKnight for " <> to_string(quantity)
             recieve_attack(life - quantity,pid)
+          {:Shot, quantity} ->
+            # IO.puts "Dragon got hit by ZombieArcher for " <> to_string(quantity)
+            recieve_attack(life - quantity,pid)
           {:Necromancer_has_died} -> IO.puts "A castigat dragonul si a ramas cu " <> to_string(life) <> " cantitate de viata."
         end
       life < 0 ->
